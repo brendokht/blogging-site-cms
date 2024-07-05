@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace BloggingSiteCMS.ViewModels
+namespace BloggingSiteCMS.DAL.Domain
 {
     /// <summary>
     /// Base class for all entities in the CMS.
@@ -17,5 +18,15 @@ namespace BloggingSiteCMS.ViewModels
         /// </summary>
         [ConcurrencyCheck]
         public string ConcurrencyStamp { get; set; } = new Guid().ToString();
+        /// <summary>
+        /// The date and time the entity was created.
+        /// </summary>
+        [Column(TypeName = "datetime2(7)")]
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        /// <summary>
+        /// The date and time the entity was last modified.
+        /// </summary>
+        [Column(TypeName = "datetime2(7)")]
+        public DateTime ModifiedAt { get; set; } = DateTime.UtcNow;
     }
 }

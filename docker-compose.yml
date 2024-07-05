@@ -1,0 +1,75 @@
+# Followed https://www.youtube.com/watch?v=XTqwvQAv9Lg
+
+services:
+    # API
+    bloggingsitecms.webapi:
+        # Environment variables
+        environment:
+            - ASPNETCORE_ENVIRONMENT=Development
+            - ASPNETCORE_HTTP_PORTS=8080
+            - ASPNETCORE_HTTPS_PORTS=8081
+            - ASPNETCORE_Kestrel__Certificates__Default__Password=${ASPNET_CERT_PASSWORD}
+            - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/bloggingsitecms.pfx
+            - ConnectionStrings__DefaultConnection=${DOCKER_CONNECTION_STRING}
+        # Image and container name
+        image: bloggingsitecms.webapi
+        container_name: bloggingsitecms.webapi
+        # Build context and Dockerfile
+        build:
+            context: ./BloggingSiteCMS.Server
+            dockerfile: ./BloggingSiteCMS.WebAPI/Dockerfile
+        # Ports
+        ports:
+            - "8080:8080"
+            - "8081:8081"
+        # Volumes
+        volumes:
+            - ~/.aspnet/https:/https:ro
+        # Depends on database being healthy
+        depends_on:
+            database.server:
+                condition: service_healthy
+
+    # Database
+    database.server:
+        # Image and container name
+        image: "mcr.microsoft.com/mssql/server:2022-latest"
+        container_name: "database.server"
+        user: root
+        # Ports
+        ports:
+            - "1433:1433"
+        # Environment variables
+        environment:
+            - ACCEPT_EULA=Y
+        # Volumes
+        volumes:
+            - blogging-site-cms-mssql-data:/var/opt/mssql/data
+            - blogging-site-cms-mssql-log:/var/opt/mssql/log
+        # Healthcheck to make sure database is working as expected
+        healthcheck:
+            test: /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P "${MSSQL_SA_PASSWORD}" -Q "SELECT 1" -b -o /dev/null
+            interval: 10s
+            timeout: 3s
+            retries: 10
+            start_period: 10s
+
+    # Website
+    bloggingsitecms.website:
+        # Build context and Dockerfile
+        build:
+            context: ./BloggingSiteCMS.Website
+            dockerfile: ./Dockerfile
+        # Image and container name
+        image: bloggingsitecms.website
+        container_name: "bloggingsitecms.website"
+        # Ports
+        ports:
+            - "5173:5173"
+        # Depends on API being healthy
+        depends_on:
+            - bloggingsitecms.webapi
+
+volumes:
+    blogging-site-cms-mssql-data:
+    blogging-site-cms-mssql-log:
