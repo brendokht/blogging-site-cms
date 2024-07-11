@@ -1,32 +1,37 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
+using Microsoft.EntityFrameworkCore;
+
 namespace BloggingSiteCMS.DAL.Domain
 {
     /// <summary>
     /// Base class for all entities in the CMS.
     /// </summary>
-    public class CMSEntity
+    public abstract class CMSEntity
     {
         /// <summary>
         /// The unique identifier for the entity.
         /// </summary>
-        public string Id { get; set; } = new Guid().ToString();
-        // Must assign new ConcurrencyStamp whenever persisting a new change to the model.
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public string? Id { get; set; }
         /// <summary>
-        /// A random value that must change whenever a user is persisted to the store, for concurrency reasons.
+        /// A byte array that is automatically assigned a new value on update. Used for concurrency
         /// </summary>
-        [ConcurrencyCheck]
-        public string ConcurrencyStamp { get; set; } = new Guid().ToString();
+        [Timestamp]
+        public byte[]? Version { get; set; }
         /// <summary>
         /// The date and time the entity was created.
         /// </summary>
         [Column(TypeName = "datetime2(7)")]
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public DateTime CreatedAt { get; set; }
         /// <summary>
         /// The date and time the entity was last modified.
         /// </summary>
         [Column(TypeName = "datetime2(7)")]
-        public DateTime ModifiedAt { get; set; } = DateTime.UtcNow;
+        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+        public DateTime ModifiedAt { get; set; }
     }
 }

@@ -1,11 +1,12 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity;
 using BloggingSiteCMS.WebAPI.Controllers;
 using BloggingSiteCMS.DAL;
 using BloggingSiteCMS.DAL.Domain;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Custom configuration, grabs things like Connection Strings, which gets overwritten (if exists) in order of the chained method
+// appsettings.json -> appsettings.{env}.json -> env variables (in this case docker) -> user secrets
 var config = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json", true, true)
     .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", true, true)
@@ -24,7 +25,7 @@ builder.Services.AddAuthorization();
 
 builder.Services.AddDbContext<BloggingSiteCMSContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.UseSqlServer(config.GetConnectionString("DefaultConnection"));
 });
 
 builder.Services.AddIdentityCore<AppUser>().AddEntityFrameworkStores<BloggingSiteCMSContext>();

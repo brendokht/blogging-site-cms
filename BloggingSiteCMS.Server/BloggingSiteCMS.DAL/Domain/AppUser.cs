@@ -11,26 +11,31 @@ namespace BloggingSiteCMS.DAL.Domain
     public class AppUser : IdentityUser
     {
         /// <summary>
-        /// The first name of the user. This is required.
+        /// The first name of the user.
         /// </summary>
         [StringLength(50)]
-        [Required]
-        public string FirstName { get; set; } = string.Empty;
+        public string? FirstName { get; set; }
         /// <summary>
-        /// The last name of the user. This is optional.
+        /// The last name of the user.
         /// </summary>
         [StringLength(50)]
-        [Required]
-        public string LastName { get; set; } = string.Empty;
+        public string? LastName { get; set; }
+        /// <summary>
+        /// Bio of the user.
+        /// </summary>
+        [StringLength(100)]
+        public string? Bio { get; set; }
         /// <summary>
         /// The date and time the user was created.
         /// </summary>
         [Column(TypeName = "datetime2(7)")]
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public DateTime CreatedAt { get; set; }
         /// <summary>
         /// The date and time the user was last modified.
         /// </summary>
         [Column(TypeName = "datetime2(7)")]
-        public DateTime ModifiedAt { get; set; } = DateTime.UtcNow;
+        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+        public DateTime ModifiedAt { get; set; }
     }
 }
