@@ -37,5 +37,8 @@ namespace BloggingSiteCMS.DAL.Domain
         [Column(TypeName = "datetime2(7)")]
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public DateTime ModifiedAt { get; set; }
+
+        public virtual ICollection<Comment> Comments { get; set; } = new HashSet<Comment>();
+
     }
 }

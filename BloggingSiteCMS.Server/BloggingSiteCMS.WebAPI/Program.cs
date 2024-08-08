@@ -23,12 +23,12 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
 
-builder.Services.AddDbContext<BloggingSiteCMSContext>(options =>
+builder.Services.AddDbContext<CMSContext>(options =>
 {
     options.UseSqlServer(config.GetConnectionString("DefaultConnection"));
 });
 
-builder.Services.AddIdentityCore<AppUser>().AddEntityFrameworkStores<BloggingSiteCMSContext>();
+builder.Services.AddIdentityCore<AppUser>().AddEntityFrameworkStores<CMSContext>();
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 builder.Services.AddCors(options =>
@@ -54,7 +54,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 
     using var serviceScope = app.Services.CreateScope();
-    var context = serviceScope.ServiceProvider.GetService<BloggingSiteCMSContext>();
+    var context = serviceScope.ServiceProvider.GetService<CMSContext>();
     context?.Database.Migrate();
 }
 

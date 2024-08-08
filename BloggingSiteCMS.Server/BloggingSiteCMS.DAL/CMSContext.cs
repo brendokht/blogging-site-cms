@@ -5,9 +5,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BloggingSiteCMS.DAL
 {
-    public class BloggingSiteCMSContext : IdentityDbContext<AppUser>
+    public class CMSContext : IdentityDbContext<AppUser>
     {
-        public BloggingSiteCMSContext(DbContextOptions<BloggingSiteCMSContext> options) :
+        public CMSContext() { }
+
+        public CMSContext(DbContextOptions<CMSContext> options) :
             base(options)
         { }
 
@@ -22,6 +24,18 @@ namespace BloggingSiteCMS.DAL
             builder.Entity<Post>()
                 .HasMany(p => p.Tags)
                 .WithMany(c => c.Posts);
+
+            builder.Entity<Comment>()
+                .HasOne(c => c.Author)
+                .WithMany(a => a.Comments)
+                .HasForeignKey(c => c.AppUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Comment>()
+                .HasOne(c => c.Post)
+                .WithMany(p => p.Comments)
+                .HasForeignKey(c => c.PostId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
 
         public DbSet<Post> Posts { get; set; }
