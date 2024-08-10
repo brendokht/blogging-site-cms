@@ -2,6 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using BloggingSiteCMS.WebAPI.Controllers;
 using BloggingSiteCMS.DAL;
 using BloggingSiteCMS.DAL.Domain;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,7 +30,28 @@ builder.Services.AddDbContext<CMSContext>(options =>
     options.UseSqlServer(config.GetConnectionString("DefaultConnection"));
 });
 
-builder.Services.AddIdentityCore<AppUser>().AddEntityFrameworkStores<CMSContext>();
+// builder.Services.AddIdentity<AppUser, AppRole>();
+builder.Services.AddIdentity<AppUser, AppRole>(o =>
+{
+    o.User.RequireUniqueEmail = true;
+
+    o.Stores.MaxLengthForKeys = 128;
+
+    // Default
+    o.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+    o.Lockout.MaxFailedAccessAttempts = 5;
+    o.Lockout.AllowedForNewUsers = true;
+    // Default
+    o.Password.RequireDigit = true;
+    o.Password.RequireUppercase = true;
+    o.Password.RequireNonAlphanumeric = true;
+    o.Password.RequireLowercase = true;
+    o.Password.RequiredLength = 6;
+    o.Password.RequiredUniqueChars = 1;
+})
+.AddApiEndpoints()
+.AddEntityFrameworkStores<CMSContext>()
+.AddDefaultTokenProviders();
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 builder.Services.AddCors(options =>
@@ -38,8 +61,24 @@ builder.Services.AddCors(options =>
 
         policy =>
         {
-            policy.WithOrigins("http://localhost:5173").AllowAnyHeader().AllowAnyMethod().AllowCredentials();
+            policy.WithOrigins("http://localhost:5173")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
         });
+});
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+    options.Cookie.Name = "BkBlogCookie";
+    options.Cookie.HttpOnly = true;
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+    options.LoginPath = "/Identity/Account/Login";
+    // ReturnUrlParameter requires 
+    //using Microsoft.AspNetCore.Authentication.Cookies;
+    options.ReturnUrlParameter = CookieAuthenticationDefaults.ReturnUrlParameter;
+    options.SlidingExpiration = true;
 });
 
 // Add repositories to scope
@@ -64,6 +103,13 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapGroup("/identity").MapIdentityApi<AppUser>();
+
+app.MapPost("identity/logout", async (SignInManager<IdentityUser> signInManager) =>
+{
+    await signInManager.SignOutAsync().ConfigureAwait(false);
+}).RequireAuthorization();
 
 app.MapControllers();
 

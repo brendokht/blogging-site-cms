@@ -39,6 +39,10 @@ namespace BloggingSiteCMS.DAL.Domain
         public DateTime ModifiedAt { get; set; }
 
         public virtual ICollection<Comment> Comments { get; set; } = new HashSet<Comment>();
+        public virtual ICollection<AppUserClaim>? Claims { get; set; } = new List<AppUserClaim>();
+        public virtual ICollection<AppUserLogin>? Logins { get; set; } = new List<AppUserLogin>();
+        public virtual ICollection<AppUserToken>? Tokens { get; set; } = new List<AppUserToken>();
+        public virtual ICollection<AppUserRole>? UserRoles { get; set; } = new List<AppUserRole>();
 
     }
 }
