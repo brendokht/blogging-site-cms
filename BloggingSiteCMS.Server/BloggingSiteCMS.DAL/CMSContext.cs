@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BloggingSiteCMS.DAL
 {
-    public class CMSContext : IdentityDbContext<AppUser, AppRole, string, IdentityUserClaim<string>, AppUserRole, IdentityUserLogin<string>, IdentityRoleClaim<string>, IdentityUserToken<string>>
+    public class CMSContext : IdentityDbContext<AppUser, AppRole, string, AppUserClaim, AppUserRole, AppUserLogin, AppRoleClaim, AppUserToken>
     {
         public CMSContext() { }
 
@@ -93,6 +93,84 @@ namespace BloggingSiteCMS.DAL
                 .WithMany(u => u.Tokens)
                 .HasForeignKey(ut => ut.UserId)
                 .IsRequired();
+        }
+
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            var now = DateTime.UtcNow;
+
+            foreach (var changedEntity in ChangeTracker.Entries())
+            {
+                if (changedEntity.Entity is CMSEntity entity)
+                {
+                    switch (changedEntity.State)
+                    {
+                        case EntityState.Added:
+                            entity.CreatedAt = now;
+                            entity.ModifiedAt = now;
+                            break;
+                        case EntityState.Modified:
+                            Entry(entity).Property(x => x.CreatedAt).IsModified = false;
+                            entity.ModifiedAt = now;
+                            break;
+                    }
+                }
+                else if (changedEntity.Entity is AppUser user)
+                {
+                    switch (changedEntity.State)
+                    {
+                        case EntityState.Added:
+                            user.CreatedAt = now;
+                            user.ModifiedAt = now;
+                            break;
+                        case EntityState.Modified:
+                            Entry(user).Property(x => x.CreatedAt).IsModified = false;
+                            user.ModifiedAt = now;
+                            break;
+                    }
+                }
+            }
+
+            return base.SaveChangesAsync(cancellationToken);
+        }
+
+        public override int SaveChanges()
+        {
+            var now = DateTime.UtcNow;
+
+            foreach (var changedEntity in ChangeTracker.Entries())
+            {
+                if (changedEntity.Entity is CMSEntity entity)
+                {
+                    switch (changedEntity.State)
+                    {
+                        case EntityState.Added:
+                            entity.CreatedAt = now;
+                            entity.ModifiedAt = now;
+                            break;
+                        case EntityState.Modified:
+                            Entry(entity).Property(x => x.CreatedAt).IsModified = false;
+                            entity.ModifiedAt = now;
+                            break;
+                    }
+                }
+                else if (changedEntity.Entity is AppUser user)
+                {
+                    switch (changedEntity.State)
+                    {
+                        case EntityState.Added:
+                            user.CreatedAt = now;
+                            user.ModifiedAt = now;
+                            break;
+                        case EntityState.Modified:
+                            Entry(user).Property(x => x.CreatedAt).IsModified = false;
+                            user.ModifiedAt = now;
+                            break;
+                    }
+                }
+            }
+
+            return base.SaveChanges();
         }
 
         public DbSet<AppRole> AppRoles { get; set; }

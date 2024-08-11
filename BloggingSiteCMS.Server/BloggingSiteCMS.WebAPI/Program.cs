@@ -4,6 +4,7 @@ using BloggingSiteCMS.DAL;
 using BloggingSiteCMS.DAL.Domain;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,7 +21,17 @@ var config = new ConfigurationBuilder()
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition("cookieAuth", new OpenApiSecurityScheme
+    {
+        Name = "Cookie",
+        Type = SecuritySchemeType.ApiKey,
+        In = ParameterLocation.Cookie,
+        Description = "ASP.NET Core Identity Cookie",
+        Scheme = "cookieAuth"
+    });
+});
 
 builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
@@ -104,9 +115,9 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapGroup("/identity").MapIdentityApi<AppUser>();
+app.MapGroup("/api/identity").MapIdentityApi<AppUser>();
 
-app.MapPost("identity/logout", async (SignInManager<IdentityUser> signInManager) =>
+app.MapPost("api/identity/logout", async (SignInManager<AppUser> signInManager) =>
 {
     await signInManager.SignOutAsync().ConfigureAwait(false);
 }).RequireAuthorization();

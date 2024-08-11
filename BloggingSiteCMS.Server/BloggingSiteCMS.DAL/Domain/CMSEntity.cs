@@ -23,13 +23,11 @@ namespace BloggingSiteCMS.DAL.Domain
         /// The date and time the entity was created.
         /// </summary>
         [Column(TypeName = "datetime2(7)")]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public DateTime CreatedAt { get; set; }
         /// <summary>
         /// The date and time the entity was last modified.
         /// </summary>
         [Column(TypeName = "datetime2(7)")]
-        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public DateTime ModifiedAt { get; set; }
     }
 }

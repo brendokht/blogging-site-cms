@@ -14,35 +14,38 @@ namespace BloggingSiteCMS.DAL.Domain
         /// The first name of the user.
         /// </summary>
         [StringLength(50)]
+        [PersonalData]
         public string? FirstName { get; set; }
         /// <summary>
         /// The last name of the user.
         /// </summary>
         [StringLength(50)]
+        [PersonalData]
         public string? LastName { get; set; }
         /// <summary>
         /// Bio of the user.
         /// </summary>
         [StringLength(100)]
+        [PersonalData]
         public string? Bio { get; set; }
         /// <summary>
         /// The date and time the user was created.
         /// </summary>
         [Column(TypeName = "datetime2(7)")]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [PersonalData]
         public DateTime CreatedAt { get; set; }
         /// <summary>
         /// The date and time the user was last modified.
         /// </summary>
         [Column(TypeName = "datetime2(7)")]
-        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+        [PersonalData]
         public DateTime ModifiedAt { get; set; }
 
         public virtual ICollection<Comment> Comments { get; set; } = new HashSet<Comment>();
-        public virtual ICollection<AppUserClaim>? Claims { get; set; } = new List<AppUserClaim>();
-        public virtual ICollection<AppUserLogin>? Logins { get; set; } = new List<AppUserLogin>();
-        public virtual ICollection<AppUserToken>? Tokens { get; set; } = new List<AppUserToken>();
-        public virtual ICollection<AppUserRole>? UserRoles { get; set; } = new List<AppUserRole>();
+        public virtual ICollection<AppUserClaim>? Claims { get; set; }
+        public virtual ICollection<AppUserLogin>? Logins { get; set; }
+        public virtual ICollection<AppUserToken>? Tokens { get; set; }
+        public virtual ICollection<AppUserRole>? UserRoles { get; set; }
 
     }
 }
