@@ -20,6 +20,10 @@ var config = new ConfigurationBuilder()
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddControllers();
+builder.Services.AddRouting(options =>
+{
+    options.LowercaseUrls = true;
+});
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -81,11 +85,9 @@ builder.Services.AddCors(options =>
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
-    options.AccessDeniedPath = "/Identity/Account/AccessDenied";
-    options.Cookie.Name = "BkBlogCookie";
     options.Cookie.HttpOnly = true;
-    options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
-    options.LoginPath = "/Identity/Account/Login";
+    options.ExpireTimeSpan = TimeSpan.FromDays(28);
+    options.LoginPath = "/Account/Login";
     // ReturnUrlParameter requires 
     //using Microsoft.AspNetCore.Authentication.Cookies;
     options.ReturnUrlParameter = CookieAuthenticationDefaults.ReturnUrlParameter;
@@ -103,6 +105,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 
+    app.UseDeveloperExceptionPage();
+
     using var serviceScope = app.Services.CreateScope();
     var context = serviceScope.ServiceProvider.GetService<CMSContext>();
     context?.Database.Migrate();
@@ -114,13 +118,6 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
-
-app.MapGroup("/api/identity").MapIdentityApi<AppUser>();
-
-app.MapPost("api/identity/logout", async (SignInManager<AppUser> signInManager) =>
-{
-    await signInManager.SignOutAsync().ConfigureAwait(false);
-}).RequireAuthorization();
 
 app.MapControllers();
 
