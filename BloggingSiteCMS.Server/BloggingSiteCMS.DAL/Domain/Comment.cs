@@ -9,6 +9,7 @@ namespace BloggingSiteCMS.DAL.Domain
         /// The content of the post. This is required.
         /// </summary>
         [Required]
+        [StringLength(1000)]
         public string? Content { get; set; }
         /// <summary>
         /// The Id of the AppUser (the Commenter).

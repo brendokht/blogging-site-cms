@@ -12,7 +12,6 @@ namespace BloggingSiteCMS.DAL.Domain
         /// The unique identifier for the entity.
         /// </summary>
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string? Id { get; set; }
         /// <summary>
         /// A byte array that is automatically assigned a new value on update. Used for concurrency

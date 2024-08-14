@@ -106,6 +106,10 @@ namespace BloggingSiteCMS.DAL
                     switch (changedEntity.State)
                     {
                         case EntityState.Added:
+                            if (string.IsNullOrEmpty(entity.Id))
+                            {
+                                entity.Id = Guid.NewGuid().ToString();
+                            }
                             entity.CreatedAt = now;
                             entity.ModifiedAt = now;
                             break;
@@ -120,6 +124,11 @@ namespace BloggingSiteCMS.DAL
                     switch (changedEntity.State)
                     {
                         case EntityState.Added:
+                            // In case user somehow does not have an ID
+                            if (string.IsNullOrEmpty(user.Id))
+                            {
+                                user.Id = Guid.NewGuid().ToString();
+                            }
                             user.CreatedAt = now;
                             user.ModifiedAt = now;
                             break;
@@ -145,6 +154,10 @@ namespace BloggingSiteCMS.DAL
                     switch (changedEntity.State)
                     {
                         case EntityState.Added:
+                            if (string.IsNullOrEmpty(entity.Id))
+                            {
+                                entity.Id = Guid.NewGuid().ToString();
+                            }
                             entity.CreatedAt = now;
                             entity.ModifiedAt = now;
                             break;
@@ -159,6 +172,11 @@ namespace BloggingSiteCMS.DAL
                     switch (changedEntity.State)
                     {
                         case EntityState.Added:
+                            // In case user somehow does not have an ID
+                            if (string.IsNullOrEmpty(user.Id))
+                            {
+                                user.Id = Guid.NewGuid().ToString();
+                            }
                             user.CreatedAt = now;
                             user.ModifiedAt = now;
                             break;

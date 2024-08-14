@@ -25,7 +25,7 @@ namespace BloggingSiteCMS.DAL.Domain
         /// <summary>
         /// Bio of the user.
         /// </summary>
-        [StringLength(100)]
+        [StringLength(256)]
         [PersonalData]
         public string? Bio { get; set; }
         /// <summary>

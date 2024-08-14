@@ -9,6 +9,7 @@ namespace BloggingSiteCMS.DAL.Domain
         /// The title of the post. This is required.
         /// </summary>
         [Required]
+        [StringLength(100)]
         public string? Title { get; set; }
         /// <summary>
         /// The Id of the AppUser (the Author).
@@ -18,6 +19,7 @@ namespace BloggingSiteCMS.DAL.Domain
         /// <summary>
         /// The summary of the post. This is optional.
         /// </summary>
+        [StringLength(256)]
         public string? Summary { get; set; }
         /// <summary>
         /// The content of the post. This is required.
