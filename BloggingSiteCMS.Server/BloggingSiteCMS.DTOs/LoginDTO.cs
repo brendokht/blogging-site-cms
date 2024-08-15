@@ -1,9 +1,9 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace BloggingSiteCMS.ViewModels
+namespace BloggingSiteCMS.DTOs
 {
-    public class LoginViewModel
+    public class LoginDTO
     {
         [Required(ErrorMessage = "Email address is required")]
         [EmailAddress(ErrorMessage = "Invalid email address")]

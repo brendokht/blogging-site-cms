@@ -16,16 +16,19 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="8.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="8.0.2" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\BloggingSiteCMS.DAL\BloggingSiteCMS.DAL.csproj" />
+    <ProjectReference Include="..\BloggingSiteCMS.DTOs\BloggingSiteCMS.DTOs.csproj" />
     <ProjectReference Include="..\BloggingSiteCMS.ViewModels\BloggingSiteCMS.ViewModels.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Controllers\" />
+    <Folder Include="DTOs\" />
   </ItemGroup>
 
 </Project>

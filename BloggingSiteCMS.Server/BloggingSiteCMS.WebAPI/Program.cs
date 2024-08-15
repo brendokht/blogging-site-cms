@@ -5,6 +5,7 @@ using BloggingSiteCMS.DAL.Domain;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,14 +28,15 @@ builder.Services.AddRouting(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
-    options.AddSecurityDefinition("cookieAuth", new OpenApiSecurityScheme
+    options.AddSecurityDefinition("Cookie", new OpenApiSecurityScheme
     {
-        Name = "Cookie",
+        In = ParameterLocation.Header,
+        Description = "Cookie authorization",
+        Name = "Authorization",
         Type = SecuritySchemeType.ApiKey,
-        In = ParameterLocation.Cookie,
-        Description = "ASP.NET Core Identity Cookie",
-        Scheme = "cookieAuth"
     });
+
+    options.OperationFilter<SecurityRequirementsOperationFilter>();
 });
 
 builder.Services.AddAuthentication();
@@ -94,9 +96,6 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.SlidingExpiration = true;
 });
 
-// Add repositories to scope
-builder.Services.AddScoped<TestController>();
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -110,6 +109,10 @@ if (app.Environment.IsDevelopment())
     using var serviceScope = app.Services.CreateScope();
     var context = serviceScope.ServiceProvider.GetService<CMSContext>();
     context?.Database.Migrate();
+}
+else
+{
+    app.UseHsts();
 }
 
 app.UseCors(MyAllowSpecificOrigins);

@@ -22,7 +22,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BloggingSiteCMS.DAL\BloggingSiteCMS.DAL.csproj" />
-    <ProjectReference Include="..\BloggingSiteCMS.ViewModels\BloggingSiteCMS.ViewModels.csproj" />
   </ItemGroup>
 
 </Project>

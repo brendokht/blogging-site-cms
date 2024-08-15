@@ -1,13 +1,12 @@
 using System;
-using System.Text;
 
 using BloggingSiteCMS.DAL.Domain;
-using BloggingSiteCMS.ViewModels;
+//using BloggingSiteCMS.ViewModels;
+using BloggingSiteCMS.DTOs;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.WebUtilities;
 
 namespace BloggingSiteCMS.WebAPI.Controllers
 {
@@ -27,20 +26,20 @@ namespace BloggingSiteCMS.WebAPI.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        public async Task<IActionResult> Register([FromBody] RegisterViewModel viewModel)
+        public async Task<IActionResult> Register([FromBody] RegisterDTO dto)
         {
             if (ModelState.IsValid)
             {
                 AppUser user = new AppUser
                 {
-                    Email = viewModel.Email,
-                    UserName = viewModel.UserName,
-                    PhoneNumber = viewModel.PhoneNumber,
-                    FirstName = viewModel.FirstName,
-                    LastName = viewModel.LastName
+                    Email = dto.Email,
+                    UserName = dto.UserName,
+                    PhoneNumber = dto.PhoneNumber,
+                    FirstName = dto.FirstName,
+                    LastName = dto.LastName
                 };
 
-                var result = await _userManager.CreateAsync(user, viewModel.Password!);
+                var result = await _userManager.CreateAsync(user, dto.Password!);
 
                 if (result.Succeeded)
                 {
@@ -57,11 +56,11 @@ namespace BloggingSiteCMS.WebAPI.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        public async Task<IActionResult> Login([FromBody] LoginViewModel viewModel, [FromQuery] bool? useCookies, [FromQuery] bool? useSessionCookies)
+        public async Task<IActionResult> Login([FromBody] LoginDTO dto, [FromQuery] bool? useCookies, [FromQuery] bool? useSessionCookies)
         {
             if (ModelState.IsValid)
             {
-                AppUser? user = await _userManager.FindByEmailAsync(viewModel.Email!);
+                AppUser? user = await _userManager.FindByEmailAsync(dto.Email!);
 
                 if (user == null)
                 {
@@ -70,7 +69,7 @@ namespace BloggingSiteCMS.WebAPI.Controllers
 
                 var isPersistent = (useCookies == true) && (useSessionCookies != true);
 
-                var result = await _signInManager.PasswordSignInAsync(user, viewModel.Password!, isPersistent, lockoutOnFailure: true);
+                var result = await _signInManager.PasswordSignInAsync(user, dto.Password!, isPersistent, lockoutOnFailure: true);
 
                 if (result.Succeeded)
                 {

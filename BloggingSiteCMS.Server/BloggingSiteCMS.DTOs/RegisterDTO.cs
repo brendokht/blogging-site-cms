@@ -1,12 +1,9 @@
 using System;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Reflection.Metadata;
-using System.Runtime.CompilerServices;
 
-namespace BloggingSiteCMS.ViewModels
+namespace BloggingSiteCMS.DTOs
 {
-    public class RegisterViewModel
+    public class RegisterDTO
     {
         [Required(ErrorMessage = "Username is required")]
         [StringLength(15, ErrorMessage = "Username cannot be longer than 15 characters")]
@@ -28,6 +25,7 @@ namespace BloggingSiteCMS.ViewModels
         [Required(ErrorMessage = "Password is required")]
         public string? Password { get; set; }
 
+        [Required(ErrorMessage = "Confirm password is required")]
         [Compare("Password", ErrorMessage = "Password and confirm password do not match")]
         public string? ConfirmPassword { get; set; }
     }
