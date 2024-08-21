@@ -1,11 +1,11 @@
 using Microsoft.EntityFrameworkCore;
-using BloggingSiteCMS.WebAPI.Controllers;
 using BloggingSiteCMS.DAL;
 using BloggingSiteCMS.DAL.Domain;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +17,13 @@ var config = new ConfigurationBuilder()
     .AddEnvironmentVariables()
     .AddUserSecrets<Program>()
     .Build();
+
+// Add Serilog on top of Console logger, to store warnings and anything more critical
+var logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(config)
+    .CreateLogger();
+
+builder.Logging.AddSerilog(logger);
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
