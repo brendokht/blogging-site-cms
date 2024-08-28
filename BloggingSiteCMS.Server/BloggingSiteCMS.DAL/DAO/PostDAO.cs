@@ -4,6 +4,7 @@ using System.Reflection;
 using BloggingSiteCMS.DAL.Domain;
 using BloggingSiteCMS.DAL.Enums;
 
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 
 namespace BloggingSiteCMS.DAL.DAO
@@ -17,14 +18,19 @@ namespace BloggingSiteCMS.DAL.DAO
             _repo = new CMSRepository<Post>();
         }
 
+        public PostDAO(IRepository<Post> repo)
+        {
+            _repo = repo;
+        }
+
         /// <summary>
         /// Gets a Post object from the database by its ID
         /// </summary>
         /// <param name="postId">The ID of the Post object to grab</param>
         /// <returns>The Post object with the specified ID</returns>
-        public async Task<Post> GetPostAsync(string postId)
+        public async Task<Post?> GetPostAsyncByIdAsync(string postId)
         {
-            Post? post;
+            Post? post = null;
             try
             {
                 post = await _repo.GetOne(p => p.Id == postId);
@@ -32,9 +38,8 @@ namespace BloggingSiteCMS.DAL.DAO
             catch (Exception ex)
             {
                 Console.WriteLine($"Problem in {GetType().Name} {MethodBase.GetCurrentMethod()!.Name} {ex.Message}");
-                throw;
             }
-            return post!;
+            return post;
         }
 
         /// <summary>
@@ -42,7 +47,7 @@ namespace BloggingSiteCMS.DAL.DAO
         /// </summary>
         /// <param name="postId">ID of Post object to get Tag objects from</param>
         /// <returns>List of Tag objects</returns>
-        public async Task<List<Tag>> GetTagsForPostAsync(string postId)
+        public async Task<List<Tag>?> GetTagsForPostAsync(string postId)
         {
             List<Tag> tags = new List<Tag>();
             try
@@ -55,7 +60,7 @@ namespace BloggingSiteCMS.DAL.DAO
                 Console.WriteLine($"Problem in {GetType().Name} {MethodBase.GetCurrentMethod()!.Name} {ex.Message}");
                 throw;
             }
-            return tags ?? new List<Tag>();
+            return tags;
         }
 
         /// <summary>
@@ -87,6 +92,10 @@ namespace BloggingSiteCMS.DAL.DAO
             try
             {
                 status = await _repo.Update(updatedPost);
+            }
+            catch(DbUpdateConcurrencyException dbx)
+            {
+                Console.WriteLine($"Concurrency exception in {GetType().Name} {MethodBase.GetCurrentMethod()!.Name} {dbx.Message}");
             }
             catch (Exception ex)
             {

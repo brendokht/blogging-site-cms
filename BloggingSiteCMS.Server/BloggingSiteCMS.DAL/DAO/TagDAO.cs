@@ -3,6 +3,8 @@ using System.Reflection;
 
 using BloggingSiteCMS.DAL.Domain;
 
+using Microsoft.EntityFrameworkCore;
+
 using UpdateStatus = BloggingSiteCMS.DAL.Enums.UpdateStatus;
 
 namespace BloggingSiteCMS.DAL.DAO
@@ -16,6 +18,26 @@ namespace BloggingSiteCMS.DAL.DAO
             _repo = new CMSRepository<Tag>();
         }
 
+        public TagDAO(IRepository<Tag> repo)
+        {
+            _repo = repo;
+        }
+
+        public async Task<Tag?> GetTagByNameAsync(string tagName)
+        {
+            Tag? tag = null;
+            try
+            {
+                tag = await _repo.GetOne(t => t.Name == tagName);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Problem in {GetType().Name} {MethodBase.GetCurrentMethod()!.Name} {ex.Message}");
+                throw;
+            }
+            return tag;
+        }
+
         /// <summary>
         /// Add a List of Tags to the database
         /// </summary>
@@ -26,7 +48,10 @@ namespace BloggingSiteCMS.DAL.DAO
             {
                 foreach (var tag in tags)
                 {
-                    await _repo.Add(tag);
+                    if (await GetTagByNameAsync(tag.Name!) == null)
+                        await _repo.Add(tag);
+                    else
+                        continue;
                 }
             }
             catch (Exception ex)
@@ -47,6 +72,10 @@ namespace BloggingSiteCMS.DAL.DAO
             try
             {
                 status = await _repo.Update(updatedTag);
+            }
+            catch (DbUpdateConcurrencyException dbx)
+            {
+                Console.WriteLine($"Concurrency exception in {GetType().Name} {MethodBase.GetCurrentMethod()!.Name} {dbx.Message}");
             }
             catch (Exception ex)
             {
@@ -70,8 +99,8 @@ namespace BloggingSiteCMS.DAL.DAO
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Problem in {GetType().Name} {MethodBase.GetCurrentMethod()!.Name} {ex.Message}");
                 throw;
+                Console.WriteLine($"Problem in {GetType().Name} {MethodBase.GetCurrentMethod()!.Name} {ex.Message}");
             }
             return result;
         }

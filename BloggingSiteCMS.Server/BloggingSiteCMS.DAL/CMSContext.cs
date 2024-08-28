@@ -3,6 +3,7 @@ using BloggingSiteCMS.DAL.Domain;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace BloggingSiteCMS.DAL
 {
@@ -13,6 +14,22 @@ namespace BloggingSiteCMS.DAL
         public CMSContext(DbContextOptions<CMSContext> options) :
             base(options)
         { }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            var config = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json", true, true)
+                .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json", true, true)
+                .AddEnvironmentVariables()
+                .AddUserSecrets<CMSContext>()
+                .Build();
+            if (!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.UseSqlServer(config.GetConnectionString("DefaultConnection"));
+            }
+
+            base.OnConfiguring(optionsBuilder);
+        }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
