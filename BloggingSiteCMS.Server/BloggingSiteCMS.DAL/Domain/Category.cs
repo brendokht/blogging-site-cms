@@ -10,6 +10,6 @@ namespace BloggingSiteCMS.DAL.Domain
         [Required]
         [StringLength(100)]
         public string? Description { get; set; }
-        public virtual ICollection<Post> Posts { get; set; } = new HashSet<Post>();
+        public virtual ICollection<Post>? Posts { get; set; }
     }
 }

@@ -49,12 +49,12 @@ namespace BloggingSiteCMS.DAL
                 c.HasOne(c => c.Author)
                 .WithMany(a => a.Comments)
                 .HasForeignKey(c => c.AppUserId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.SetNull);
 
                 c.HasOne(c => c.Post)
                 .WithMany(a => a.Comments)
                 .HasForeignKey(c => c.PostId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.SetNull);
             });
 
             builder.Entity<AppUser>(u =>

@@ -8,73 +8,71 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BloggingSiteCMS.DAL.DAO
 {
-    public class TagDAO
+    public class CategoryDAO
     {
-        private readonly IRepository<Tag> _repo;
+        private readonly IRepository<Category> _repo;
 
-        public TagDAO()
+        public CategoryDAO()
         {
-            _repo = new CMSRepository<Tag>();
+            _repo = new CMSRepository<Category>();
         }
 
-        public TagDAO(IRepository<Tag> repo)
+        public CategoryDAO(IRepository<Category> repo)
         {
             _repo = repo;
         }
 
         /// <summary>
-        /// Gets a Tag object from the database by its Id
+        /// Gets a Category object from the database by its ID
         /// </summary>
-        /// <param name="tagName">ID of the tag</param>
-        /// <returns>The Tag object if found, else returns null</returns>
-        public async Task<Tag?> GetTagByIdAsync(string tagId)
+        /// <param name="categoryId">The ID of the Category object to grab</param>
+        /// <returns>The Category object if found, else returns null</returns>
+        public async Task<Category?> GetCategoryByIdAsync(string categoryId)
         {
-            Tag? tag = null;
+            Category? category = null;
             try
             {
-                tag = await _repo.GetOne(t => t.Id == tagId);
+                category = await _repo.GetOne(c => c.Id == categoryId);
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Problem in {GetType().Name} {MethodBase.GetCurrentMethod()!.Name} {ex.Message}");
-                throw;
             }
-            return tag;
+            return category;
         }
 
         /// <summary>
-        /// Gets a Tag object from the database by its Name
+        /// Gets a Category object from the database by its Name
         /// </summary>
-        /// <param name="tagName">Name of the tag</param>
-        /// <returns>The Tag object if found, else returns null</returns>
-        public async Task<Tag?> GetTagByNameAsync(string tagName)
+        /// <param name="categoryName">The Name of the Category object to grab</param>
+        /// <returns>The Category object if found, else returns null</returns>
+        public async Task<Category?> GetCategoryByNameAsync(string categoryName)
         {
-            Tag? tag = null;
+            Category? category = null;
             try
             {
-                tag = await _repo.GetOne(t => t.Name == tagName);
+                category = await _repo.GetOne(c => c.Name == categoryName);
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Problem in {GetType().Name} {MethodBase.GetCurrentMethod()!.Name} {ex.Message}");
-                throw;
             }
-            return tag;
+            return category;
         }
 
         /// <summary>
-        /// Add a List of Tags to the database
+        /// Add a List of Categories to the database
         /// </summary>
-        /// <param name="tags">List of Tag objects</param>
-        public async Task AddTagsAsync(List<Tag> tags)
+        /// <param name="categories">List of Category objects</param>
+        public async Task AddCategoriesAsync(List<Category> categories)
         {
             try
             {
-                foreach (var tag in tags)
+                foreach (var category in categories)
                 {
-                    // TODO: Make a database index for Tag.Name
-                    if (await GetTagByNameAsync(tag.Name!) == null)
-                        await _repo.Add(tag);
+                    // TODO: Make a database index for Category.Name
+                    if (await GetCategoryByNameAsync(category.Name!) == null)
+                        await _repo.Add(category);
                     else
                         continue;
                 }
@@ -87,16 +85,16 @@ namespace BloggingSiteCMS.DAL.DAO
         }
 
         /// <summary>
-        /// Updates a singular Tag object
+        /// Updates a singular Category object
         /// </summary>
-        /// <param name="updatedTag">The Tag object to be updated</param>
+        /// <param name="updatedCategory">The Category object to be updated</param>
         /// <returns>An integer value representing the status of the update</returns>
-        public async Task<UpdateStatus> UpdateTagAsync(Tag updatedTag)
+        public async Task<UpdateStatus> UpdateCategoryAsync(Category updatedCategory)
         {
             UpdateStatus status = UpdateStatus.Failed;
             try
             {
-                status = await _repo.Update(updatedTag);
+                status = await _repo.Update(updatedCategory);
             }
             catch (DbUpdateConcurrencyException dbx)
             {
@@ -111,16 +109,16 @@ namespace BloggingSiteCMS.DAL.DAO
         }
 
         /// <summary>
-        /// Deletes a singular Tag object
+        /// Deletes a singular Category object
         /// </summary>
-        /// <param name="tagId">The ID of the Tag object to delete</param>
+        /// <param name="categoryId">The ID of the Category object to delete</param>
         /// <returns>An integer representing how many objects were deleted</returns>
-        public async Task<int> DeleteTagAsync(string tagId)
+        public async Task<int> DeleteCategoryAsync(string categoryId)
         {
             int result;
             try
             {
-                result = await _repo.Delete(tagId);
+                result = await _repo.Delete(categoryId);
             }
             catch (Exception ex)
             {

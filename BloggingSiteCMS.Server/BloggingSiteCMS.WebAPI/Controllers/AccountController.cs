@@ -30,7 +30,7 @@ namespace BloggingSiteCMS.WebAPI.Controllers
         {
             if (ModelState.IsValid)
             {
-                AppUser user = new AppUser
+                AppUser user = new()
                 {
                     Email = dto.Email,
                     UserName = dto.UserName,

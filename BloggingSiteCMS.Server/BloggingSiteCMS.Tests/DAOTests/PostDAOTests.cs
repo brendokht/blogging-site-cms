@@ -1,8 +1,8 @@
 ﻿using System.Linq.Expressions;
 
+using BloggingSiteCMS.DAL;
 using BloggingSiteCMS.DAL.DAO;
 using BloggingSiteCMS.DAL.Domain;
-using BloggingSiteCMS.DAL;
 
 using Moq;
 
@@ -14,26 +14,28 @@ namespace BloggingSiteCMS.Tests.DAOTests
     {
         private readonly PostDAO _dao;
         private readonly Mock<IRepository<Post>> _mockRepo;
+        private readonly CMSContext _context;
 
         public PostDAOTests()
         {
             _mockRepo = new();
             _dao = new PostDAO(_mockRepo.Object);
+            _context = new CMSContext();
         }
 
         [Fact]
         public async Task Add_Should_Return_1()
         {
             // Arrange
-            Post post = new Post()
+            Post post = new()
             {
                 Id = Guid.NewGuid().ToString(),
                 Title = "Test Post",
-                Author = new AppUser(),
+                Author = It.IsAny<AppUser>(),
                 Content = "Testing!",
-                CreatedAt = DateTime.Now,
-                ModifiedAt = DateTime.Now,
-                PublishedDate = DateTime.Now,
+                CreatedAt = DateTime.UtcNow,
+                ModifiedAt = DateTime.UtcNow,
+                PublishedDate = DateTime.UtcNow,
             };
 
             _mockRepo.Setup(repo => repo.Add(It.IsAny<Post>())).ReturnsAsync((Post post) => post);
@@ -49,15 +51,15 @@ namespace BloggingSiteCMS.Tests.DAOTests
         public async Task Update_Should_Return_Ok()
         {
             // Arrange
-            Post post = new Post()
+            Post post = new()
             {
                 Id = Guid.NewGuid().ToString(),
                 Title = "Test Post",
-                Author = new AppUser(),
+                Author = It.IsAny<AppUser>(),
                 Content = "Testing!",
-                CreatedAt = DateTime.Now,
-                ModifiedAt = DateTime.Now,
-                PublishedDate = DateTime.Now,
+                CreatedAt = DateTime.UtcNow,
+                ModifiedAt = DateTime.UtcNow,
+                PublishedDate = DateTime.UtcNow,
             };
 
             _mockRepo.Setup(repo => repo.Update(It.IsAny<Post>())).ReturnsAsync(UpdateStatus.Ok);
@@ -77,21 +79,25 @@ namespace BloggingSiteCMS.Tests.DAOTests
             PostDAO dao1 = new();
             PostDAO dao2 = new();
 
-            Post post = new Post()
+            AppUser user = new()
+            {
+                Id = Guid.NewGuid().ToString()
+            };
+            Post post = new()
             {
                 Id = Guid.NewGuid().ToString(),
                 Title = "Test Post",
-                Author = new AppUser(),
+                Author = user,
                 Content = "Testing!",
-                CreatedAt = DateTime.Now,
-                ModifiedAt = DateTime.Now,
-                PublishedDate = DateTime.Now,
+                CreatedAt = DateTime.UtcNow,
+                ModifiedAt = DateTime.UtcNow,
+                PublishedDate = DateTime.UtcNow,
             };
 
             await dao1.AddPostAsync(post);
 
-            Post? testPost1 = await dao1.GetPostAsyncByIdAsync(post.Id);
-            Post? testPost2 = await dao2.GetPostAsyncByIdAsync(post.Id);
+            Post? testPost1 = await dao1.GetPostByIdAsync(post.Id);
+            Post? testPost2 = await dao2.GetPostByIdAsync(post.Id);
 
             testPost1!.Title = "Test Post 1";
 
@@ -108,30 +114,95 @@ namespace BloggingSiteCMS.Tests.DAOTests
             }
 
             _ = await dao1.DeletePostAsync(testPost1!.Id!);
+            _ = _context.Users.Remove(user);
+            _context.SaveChanges();
         }
 
         [Fact]
-        public async Task Get_Should_Return_Post()
+        public async Task GetById_Should_Return_Post()
         {
             // Arrange
-            Post post = new Post()
+            Post post = new()
             {
                 Id = Guid.NewGuid().ToString(),
                 Title = "Test Post",
-                Author = new AppUser(),
+                Author = It.IsAny<AppUser>(),
                 Content = "Testing!",
-                CreatedAt = DateTime.Now,
-                ModifiedAt = DateTime.Now,
-                PublishedDate = DateTime.Now,
+                CreatedAt = DateTime.UtcNow,
+                ModifiedAt = DateTime.UtcNow,
+                PublishedDate = DateTime.UtcNow,
             };
 
             _mockRepo.Setup(repo => repo.GetOne(It.IsAny<Expression<Func<Post, bool>>>())).ReturnsAsync(post);
 
             // Act
-            Post? result = await _dao.GetPostAsyncByIdAsync(post.Id);
+            Post? result = await _dao.GetPostByIdAsync(post.Id);
 
             // Assert
+            Assert.NotNull(result);
             Assert.Equal(post, result);
+            _mockRepo.Verify(repo => repo.GetOne(It.IsAny<Expression<Func<Post, bool>>>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task GetTagsForPost_Should_Return_Tags()
+        {
+            List<Tag> tags =
+            [
+                new Tag() { Id = Guid.NewGuid().ToString() },
+                new Tag() { Id = Guid.NewGuid().ToString() },
+                new Tag() { Id = Guid.NewGuid().ToString() }
+            ];
+            // Arrange
+            Post post = new()
+            {
+                Id = Guid.NewGuid().ToString(),
+                Title = "Test Post",
+                Author = It.IsAny<AppUser>(),
+                Content = "Testing!",
+                CreatedAt = DateTime.UtcNow,
+                ModifiedAt = DateTime.UtcNow,
+                PublishedDate = DateTime.UtcNow,
+                Tags = tags
+            };
+
+            _mockRepo.Setup(repo => repo.GetOne(It.IsAny<Expression<Func<Post, bool>>>())).ReturnsAsync(post);
+
+            List<Tag>? result = await _dao.GetTagsForPostAsync(post.Id);
+
+            Assert.NotNull(result);
+            Assert.Equal(tags, result);
+            _mockRepo.Verify(repo => repo.GetOne(It.IsAny<Expression<Func<Post, bool>>>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task GetCommentsForPost_Should_Return_Comments()
+        {
+            List<Comment> comments =
+            [
+                new Comment() { Id = Guid.NewGuid().ToString() },
+                new Comment() { Id = Guid.NewGuid().ToString() },
+                new Comment() { Id = Guid.NewGuid().ToString() }
+            ];
+            // Arrange
+            Post post = new()
+            {
+                Id = Guid.NewGuid().ToString(),
+                Title = "Test Post",
+                Author = It.IsAny<AppUser>(),
+                Content = "Testing!",
+                CreatedAt = DateTime.UtcNow,
+                ModifiedAt = DateTime.UtcNow,
+                PublishedDate = DateTime.UtcNow,
+                Comments = comments
+            };
+
+            _mockRepo.Setup(repo => repo.GetOne(It.IsAny<Expression<Func<Post, bool>>>())).ReturnsAsync(post);
+
+            List<Comment>? result = await _dao.GetCommentsForPostAsync(post.Id);
+
+            Assert.NotNull(result);
+            Assert.Equal(comments, result);
             _mockRepo.Verify(repo => repo.GetOne(It.IsAny<Expression<Func<Post, bool>>>()), Times.Once);
         }
 
@@ -139,15 +210,15 @@ namespace BloggingSiteCMS.Tests.DAOTests
         public async Task Delete_Should_Delete_1()
         {
             // Arrange
-            Post post = new Post()
+            Post post = new()
             {
                 Id = Guid.NewGuid().ToString(),
                 Title = "Test Post",
-                Author = new AppUser(),
+                Author = It.IsAny<AppUser>(),
                 Content = "Testing!",
-                CreatedAt = DateTime.Now,
-                ModifiedAt = DateTime.Now,
-                PublishedDate = DateTime.Now,
+                CreatedAt = DateTime.UtcNow,
+                ModifiedAt = DateTime.UtcNow,
+                PublishedDate = DateTime.UtcNow,
             };
 
             _mockRepo.Setup(repo => repo.Delete(post.Id)).ReturnsAsync(1);

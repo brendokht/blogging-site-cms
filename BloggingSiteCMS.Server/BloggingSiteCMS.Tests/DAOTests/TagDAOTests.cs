@@ -27,9 +27,9 @@ namespace BloggingSiteCMS.Tests.DAOTests
             // Arrange
             var tags = new List<Tag>
             {
-                new Tag { Name = "Tag1" },
-                new Tag { Name = "Tag2" },
-                new Tag { Name = "Tag3" }
+                new() { Name = "Tag1" },
+                new() { Name = "Tag2" },
+                new() { Name = "Tag3" }
             };
 
             _mockRepo.Setup(repo => repo.Add(It.IsAny<Tag>())).ReturnsAsync((Tag tag) => tag);
@@ -44,7 +44,7 @@ namespace BloggingSiteCMS.Tests.DAOTests
         [Fact]
         public async Task Update_Should_Return_Ok()
         {
-            Tag tag = new Tag() { Id = Guid.NewGuid().ToString(), Name = "Tag1" };
+            Tag tag = new() { Id = Guid.NewGuid().ToString(), Name = "Tag1" };
 
             _mockRepo.Setup(repo => repo.Update(It.IsAny<Tag>())).ReturnsAsync(UpdateStatus.Ok);
 
@@ -63,13 +63,13 @@ namespace BloggingSiteCMS.Tests.DAOTests
             TagDAO dao1 = new();
             TagDAO dao2 = new();
 
-            Tag tag = new Tag()
+            Tag tag = new()
             {
                 Id = Guid.NewGuid().ToString(),
                 Name = "Tag1"
             };
 
-            await dao1.AddTagsAsync(new List<Tag>() { tag });
+            await dao1.AddTagsAsync([tag]);
 
             Tag? testTag1 = await dao1.GetTagByNameAsync("Tag1");
             Tag? testTag2 = await dao2.GetTagByNameAsync("Tag1");
@@ -92,10 +92,10 @@ namespace BloggingSiteCMS.Tests.DAOTests
         }
 
         [Fact]
-        public async Task Get_Should_Return_Tag()
+        public async Task GetByName_Should_Return_Tag()
         {
             // Arrange
-            Tag tag = new Tag() { Id = Guid.NewGuid().ToString(), Name = "Tag1" };
+            Tag tag = new() { Name = "Tag1" };
 
             _mockRepo.Setup(repo => repo.GetOne(It.IsAny<Expression<Func<Tag, bool>>>())).ReturnsAsync(tag);
 
@@ -103,6 +103,24 @@ namespace BloggingSiteCMS.Tests.DAOTests
             Tag? result = await _dao.GetTagByNameAsync(tag.Name);
 
             // Assert
+            Assert.NotNull(result);
+            Assert.Equal(tag, result);
+            _mockRepo.Verify(repo => repo.GetOne(It.IsAny<Expression<Func<Tag, bool>>>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task GetById_Should_Return_Tag()
+        {
+            // Arrange
+            Tag tag = new() { Id = Guid.NewGuid().ToString() };
+
+            _mockRepo.Setup(repo => repo.GetOne(It.IsAny<Expression<Func<Tag, bool>>>())).ReturnsAsync(tag);
+
+            // Act
+            Tag? result = await _dao.GetTagByNameAsync(tag.Id);
+
+            // Assert
+            Assert.NotNull(result);
             Assert.Equal(tag, result);
             _mockRepo.Verify(repo => repo.GetOne(It.IsAny<Expression<Func<Tag, bool>>>()), Times.Once);
         }
@@ -111,7 +129,7 @@ namespace BloggingSiteCMS.Tests.DAOTests
         public async Task Delete_Should_Delete_1()
         {
             // Arrange
-            Tag tag = new Tag() { Id = Guid.NewGuid().ToString(), Name = "Tag1" };
+            Tag tag = new() { Id = Guid.NewGuid().ToString(), Name = "Tag1" };
 
             _mockRepo.Setup(repo => repo.Delete(tag.Id)).ReturnsAsync(1);
 

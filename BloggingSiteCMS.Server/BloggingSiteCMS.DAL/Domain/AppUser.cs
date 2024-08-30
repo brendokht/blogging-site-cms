@@ -41,7 +41,7 @@ namespace BloggingSiteCMS.DAL.Domain
         [PersonalData]
         public DateTime ModifiedAt { get; set; }
 
-        public virtual ICollection<Comment> Comments { get; set; } = new HashSet<Comment>();
+        public virtual List<Comment>? Comments { get; set; }
         public virtual ICollection<AppUserClaim>? Claims { get; set; }
         public virtual ICollection<AppUserLogin>? Logins { get; set; }
         public virtual ICollection<AppUserToken>? Tokens { get; set; }
